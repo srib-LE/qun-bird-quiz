@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>群友是啥鸟？ | QQ群人格测试</title>
+<style>
+/* ═══════════════ 2.jpg 暖色治愈 · Impeccable 精修 ═══════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f3e8;--card:#fafaf5;--card2:#f0ecdb;--accent:#bec4a2;
+  --accent2:#a3aa85;--gold:#c4a96a;--gold-light:#e8d5a8;
+  --text:#5c5548;--muted:#6e685a;--white:#fdfcf7;
+  --dim1:#d4955c;--dim2:#8b9a7e;--dim3:#c4a96a;
+  --dim4:#d4a0a0;--dim5:#6b8a9e;
+  --shadow:0 4px 24px rgba(80,70,50,.08);
+  --shadow-lg:0 12px 48px rgba(80,70,50,.12);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+  --ease-quart: cubic-bezier(.19,1,.22,1);
+}
+body{
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+  overflow-x:hidden;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Warm glow bg ── */
+.bg-glow{position:fixed;pointer-events:none;z-index:0}
+.bg-circle{
+  border-radius:50%;
+  background:radial-gradient(circle,var(--accent) 0%,transparent 70%);
+  opacity:.3;
+}
+.bg-circle-1{width:600px;height:600px;top:-200px;right:-150px;opacity:.25}
+.bg-circle-2{width:500px;height:500px;bottom:-150px;left:-120px;opacity:.2}
+.bg-circle-3{width:350px;height:350px;top:45%;left:55%;opacity:.18}
+
+/* ── Screens ── */
+.screen{display:none;position:relative;z-index:1;min-height:100vh}
+.screen.active{display:flex;flex-direction:column;align-items:center}
+#landing{justify-content:center;padding:40px 20px}
+#quiz-screen{padding:20px}
+#result-screen{padding:40px 20px}
+
+/* ── Landing ── */
+.hero{text-align:center;max-width:700px}
+.hero .logo{
+  font-size:2.8rem;font-weight:900;color:var(--accent2);
+  letter-spacing:.06em;margin-bottom:4px;
+}
+.hero .sub{color:var(--muted);font-size:1.1rem;margin-bottom:8px}
+.hero h1{font-size:2.2rem;margin-bottom:12px;line-height:1.3;color:var(--text)}
+.hero .desc{color:var(--muted);font-size:1rem;margin-bottom:32px;max-width:500px;margin-inline:auto}
+
+.bird-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:32px;max-width:600px}
+.bird-grid .bird-cell{
+  width:60px;height:50px;border-radius:10px;overflow:hidden;
+  background-image:url('111.jpg');background-size:500% 400%;
+  transition:transform .25s,box-shadow .25s;cursor:default;
+  border:2px solid var(--accent);box-shadow:0 2px 8px rgba(80,70,50,.06);
+}
+.bird-grid .bird-cell:hover{
+  transform:scale(1.28);z-index:2;
+  border-color:var(--gold);box-shadow:0 4px 20px rgba(196,169,106,.35);
+}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:14px 40px;
+  border-radius:50px;font-size:1.1rem;font-weight:700;border:none;cursor:pointer;
+  transition:all .25s;text-decoration:none;color:#fff;font-family:inherit;
+  background:var(--accent2);
+  box-shadow:0 4px 16px rgba(163,170,133,.3);
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(163,170,133,.4);background:#919a72}
+.btn:active{transform:scale(.97)}
+
+.btn-outline{
+  background:transparent;border:2px solid var(--accent);
+  color:var(--accent2);
+}
+.btn-outline:hover{background:rgba(190,196,162,.2)}
+
+/* ── Quiz ── */
+.quiz-container{max-width:640px;width:100%;margin:0 auto}
+.progress-wrap{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.progress-bar{flex:1;height:6px;background:var(--accent);border-radius:10px;overflow:hidden;opacity:.5}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--gold));border-radius:10px;transition:width .4s}
+.progress-text{font-size:.85rem;color:var(--muted);white-space:nowrap}
+.progress-dots{display:flex;gap:6px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
+.progress-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:.4;transition:all .3s}
+.progress-dot.done{background:var(--accent2);opacity:1}
+.progress-dot.current{background:var(--gold);opacity:1;box-shadow:0 0 8px var(--gold-light);transform:scale(1.3)}
+
+.question-card{
+  background:var(--card);border-radius:24px;padding:32px;margin-bottom:20px;
+  border:1px solid rgba(190,196,162,.3);box-shadow:var(--shadow);
+  transition:transform .35s var(--ease-out),opacity .3s ease-out;
+}
+.question-num{
+  font-size:.85rem;color:var(--accent2);font-weight:700;margin-bottom:8px;
+  display:inline-block;background:var(--card2);padding:4px 14px;border-radius:20px;
+}
+.question-text{font-size:1.25rem;font-weight:700;margin-bottom:28px;line-height:1.5;color:var(--text)}
+
+.options{display:flex;flex-direction:column;gap:12px}
+.option{
+  display:flex;align-items:flex-start;gap:14px;padding:16px 20px;
+  background:var(--white);border-radius:14px;cursor:pointer;
+  border:2px solid transparent;transition:all .25s;
+  text-align:left;color:var(--text);font-size:1rem;line-height:1.5;
+}
+.option:hover{border-color:var(--accent);background:var(--card2);transform:translateX(4px)}
+.option.selected{
+  border-color:var(--accent2);background:#edf0e0;box-shadow:0 2px 12px rgba(163,170,133,.15);
+  pointer-events:none;
+}
+.option .opt-letter{
+  flex-shrink:0;width:32px;height:32px;border-radius:50%;
+  background:var(--card2);display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.9rem;color:var(--accent2);
+  transition:all .3s var(--ease-quart);
+}
+.option.selected .opt-letter{
+  background:var(--accent2);color:#fff;
+  animation: popCheck .4s var(--ease-quart);
+}
+@keyframes popCheck{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+  100%{transform:scale(1)}
+}
+
+/* Option exit stagger */
+.option.exiting{
+  opacity:0;transform:translateX(-20px);
+  transition:all .35s ease-in;
+}
+.option.exiting:nth-child(2){transition-delay:.04s}
+.option.exiting:nth-child(3){transition-delay:.08s}
+.option.exiting:nth-child(4){transition-delay:.12s}
+
+.nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+.nav-btns .btn{padding:12px 28px;font-size:.95rem}
+.auto-hint{font-size:.8rem;color:var(--muted);letter-spacing:.04em;animation:pulseHint 2.5s ease-in-out infinite}
+@keyframes pulseHint{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── Result ── */
+.result-card{max-width:560px;width:100%;text-align:center}
+.result-label{font-size:.9rem;color:var(--accent2);font-weight:700;margin-bottom:8px;letter-spacing:2px}
+.result-bird-img{
+  width:200px;height:167px;margin:0 auto 20px;border-radius:20px;overflow:hidden;
+  background-image:url('111.jpg');background-size:500% 400%;
+  border:3px solid var(--accent);box-shadow:0 8px 40px rgba(163,170,133,.2);
+}
+.result-bird-name{font-size:2.8rem;font-weight:900;margin-bottom:4px;color:var(--text)}
+.result-bird-tag{font-size:1.2rem;color:var(--accent2);margin-bottom:20px}
+.result-bird-desc{
+  background:var(--card);border-radius:16px;padding:24px;
+  font-size:1.05rem;line-height:1.7;color:var(--text);
+  margin-bottom:28px;border:1px solid rgba(190,196,162,.2);
+}
+
+.dimension-bars{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.dim-row{display:flex;align-items:center;gap:12px}
+.dim-label{width:80px;font-size:.8rem;color:var(--muted);text-align:right;flex-shrink:0}
+.dim-bar-wrap{flex:1;height:8px;background:var(--accent);border-radius:10px;overflow:hidden;opacity:.5}
+.dim-bar-fill{height:100%;border-radius:10px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.dim-val{width:28px;font-size:.8rem;color:var(--muted);flex-shrink:0}
+
+.result-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease-out}
+@keyframes scaleIn{
+  0%{opacity:0;transform:scale(.9)}
+  100%{opacity:1;transform:scale(1)}
+}
+.bounce-in{animation:scaleIn .45s var(--ease-quart)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ── Mobile ── */
+@media(max-width:600px){
+  .hero .logo{font-size:2rem}
+  .hero h1{font-size:1.5rem}
+  .bird-grid .bird-cell{width:44px;height:37px}
+  .question-card{padding:20px}
+  .question-text{font-size:1.1rem}
+  .option{padding:14px 16px;font-size:.9rem;min-height:50px}
+  .result-bird-img{width:150px;height:125px}
+  .result-bird-name{font-size:2rem}
+}
+
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  .feather{display:none}
+}
+
+/* ── Focus visible ── */
+:focus-visible{
+  outline:2px solid var(--accent2);
+  outline-offset:3px;
+  border-radius:4px;
+}
+.btn:focus-visible{outline-offset:4px;border-radius:50px}
+.option:focus-visible{outline-offset:-1px;border-radius:14px}
+
+/* ── Heading balance ── */
+.hero h1,.question-text,.result-bird-name,.result-bird-tag{text-wrap:balance}
+
+/* Feather particles */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0}
+.feather{
+  position:absolute;font-size:1.5rem;animation:fall linear forwards;
+  opacity:.35;filter:grayscale(0);
+}
+@keyframes fall{
+  0%{transform:translateY(-10vh) rotate(0deg);opacity:.35}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow bg-circle bg-circle-1"></div>
+<div class="bg-glow bg-circle bg-circle-2"></div>
+<div class="bg-glow bg-circle bg-circle-3"></div>
+<div class="particles" id="particles"></div>
+
+<!-- ════════════ LANDING ════════════ -->
+<div class="screen active" id="landing">
+  <div class="hero fade-up">
+    <div class="logo">🪶 bird-ending</div>
+    <div class="sub">15 题 / 5 维度 / 20 种结局</div>
+    <h1>群友是啥鸟？</h1>
+    <p class="desc">在活跃度、影响力、表达欲、归属感和战斗力之间，<br>测出你在群聊里的真实鸟类人格。</p>
+    <div class="bird-grid" id="birdGrid"></div>
+    <button class="btn" onclick="startQuiz()">✨ 开始测试</button>
+  </div>
+</div>
+
+<!-- ════════════ QUIZ ════════════ -->
+<div class="screen" id="quiz-screen">
+  <div class="quiz-container">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-text" id="progressText">1 / 15</span>
+    </div>
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="question-card fade-up" id="questionCard">
+      <div class="question-num" id="questionNum"></div>
+      <div class="question-text" id="questionText"></div>
+      <div class="options" id="options"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-outline" id="btnPrev" onclick="prevQuestion()" style="visibility:hidden">← 上一题</button>
+      <span class="auto-hint" id="autoHint">选择后自动跳转 ✨</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ RESULT ════════════ -->
+<div class="screen" id="result-screen">
+  <div class="result-card">
+    <div class="result-label">你的群聊人格是</div>
+    <div class="result-bird-img bounce-in" id="resultImg"></div>
+    <div class="result-bird-name" id="resultName"></div>
+    <div class="result-bird-tag" id="resultTag"></div>
+    <div class="dimension-bars" id="dimensionBars"></div>
+    <div class="result-bird-desc" id="resultDesc"></div>
+    <div class="result-actions">
+      <button class="btn" onclick="restartQuiz()">🔄 再测一次</button>
+      <button class="btn btn-outline" onclick="shareResult()">📋 复制结果</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════ DATA ═══════════════
+
+const BIRDS = [
+  { id:0,  name:'鹦鹉',tag:'复读机本机',emoji:'🦜',
+    desc:'群聊复读机本机。+1 已经刻进了你的 DNA，看到队形不跟浑身难受。偶尔手滑破坏队形被群嘲，但下次还敢+1。对你来说，群聊的意义在于参与感——哪怕只是复制粘贴。',
+    profile:[7,3,5,6,4] },
+  { id:1,  name:'猫头鹰',tag:'深夜值班员',emoji:'🦉',
+    desc:'白天你像死了一样安静，但凌晨两点准时上线。你会默默爬完 999 条未读消息，然后在三个小时前的某条消息下面精准回复。你是群里的守夜人，黑暗中的观察者。',
+    profile:[3,5,6,3,5] },
+  { id:2,  name:'孔雀',tag:'斗图狂魔',emoji:'🦚',
+    desc:'你的表情包库存深不见底，分类精细到令人发指。能用图对话你绝不打字，斗图输不了一点。每次你出场都自带视觉盛宴，群友的表情包有一半是从你这里偷的。',
+    profile:[10,9,10,8,6] },
+  { id:3,  name:'信天翁',tag:'龙王本王',emoji:'🐦',
+    desc:'一个人扛起群聊 50% 的 KPI。连发 20 条消息不需要第二个人接话，你的存在本身就是群活跃度的保证。群主应该给你发工资，没有你，这个群早死了。',
+    profile:[12,12,8,10,7] },
+  { id:4,  name:'啄木鸟',tag:'硬核技术宅',emoji:'🐦',
+    desc:'专治各种疑难杂症，答疑精准到行号。你是群里公认的活体搜索引擎，日常被 @ 求助的对象。你不常说话，但每次开口都让人想截图保存。',
+    profile:[5,6,3,7,4] },
+  { id:5,  name:'鸽子',tag:'和平大使',emoji:'🕊️',
+    desc:'群内吵架终结者。"各退一步""都消消气""算了算了"，你是群聊里的联合国维和部队。你受不了火药味，宁愿自己当和事佬也不愿意看到群里气氛变差。',
+    profile:[6,6,5,7,3] },
+  { id:6,  name:'企鹅',tag:'吃瓜群众',emoji:'🐧',
+    desc:'"有没有前情提要？""纯路人不懂就问。"你永远在围观但从不站队。瓜吃完就走，深藏功与名。群里的每一次大战你都是最佳观众，但没有人知道你到底支持谁。',
+    profile:[4,3,5,3,5] },
+  { id:7,  name:'麻雀',tag:'好奇萌新',emoji:'🐤',
+    desc:'每个梗都要问出处，每个表情包都想要原图。你叽叽喳喳问个不停，但大家从不觉得烦——因为你的好奇心本身就成了群里的快乐源泉。群友看着你就像看着当年的自己。',
+    profile:[8,6,8,5,4] },
+  { id:8,  name:'乌鸦',tag:'陈年史官',emoji:'🐦‍⬛',
+    desc:'三年前的聊天记录你都能翻出来，谁说过什么违心话你全记着。群聊黑历史活化石，老梗档案馆。当群友试图否认某段黑历史时，你的截图就是终极武器。',
+    profile:[5,7,4,6,5] },
+  { id:9,  name:'鸬鹚',tag:'精准捕鱼人',emoji:'🐦‍⬛',
+    desc:'你长期深潜，但一旦上浮就是精准暴击。每条回复都抓到要害，说完继续蹲着晾翅膀。群友对你的印象是："这人平时不说话，一说话就让人无话可说。"',
+    profile:[3,7,3,4,8] },
+  { id:10, name:'夜莺',tag:'午夜诗人',emoji:'🎵',
+    desc:'零点准时 emo 营业。深夜发一段意味不明的话然后撤回，第二天装作什么都没发生。你的情感浓度在午夜达到峰值，群聊是你深夜灵魂的收容所。',
+    profile:[5,5,12,5,5] },
+  { id:11, name:'蜂鸟',tag:'干货投喂机',emoji:'🌺',
+    desc:'链接转发永不停歇：好文、好工具、好资源。体积小能量大，从不废话只扔干货。群友把你设为特别关注不是为了聊天——是为了白嫖你的收藏夹。',
+    profile:[7,8,3,5,3] },
+  { id:12, name:'喜鹊',tag:'专业杠精',emoji:'🐦',
+    desc:'"不是，你这话有问题……"先杠再说，杠到一半可能发现对面说得对，但气势不能输。你是群里的辩论发动机，有你就有话题，有你就有活力，有你就没有人能安宁。',
+    profile:[9,10,5,7,11] },
+  { id:13, name:'海鸥',tag:'红包狙击手',emoji:'🍟',
+    desc:'抢红包手速天花板，每次红包出现你都精准出击。"谢谢老板"发完继续潜水，下一次出现还是抢红包。群友怀疑你装了红包外挂，实际上你只是把群通知调到了最高。',
+    profile:[2,3,4,2,4] },
+  { id:14, name:'燕子',tag:'退群积极分子',emoji:'🕊️',
+    desc:'今天进群明天退后天又回来，来去如风。你的进出次数比发言次数还多。群友看到"xxx已加入群聊"和"xxx已退出群聊"已经麻木，甚至开了个赌盘赌你下次什么时候再走。',
+    profile:[6,7,10,4,7] },
+  { id:15, name:'翠鸟',tag:'社恐患者',emoji:'💎',
+    desc:'发言前反复编辑五分钟，发出去秒撤回。一闪而过留下一道蓝色残影。你其实有很多话想说，但每次话到嘴边就变成了"算了"。群友甚至不知道你的存在——直到某天你终于发出了一条没撤回的消息。',
+    profile:[2,3,6,2,3] },
+  { id:16, name:'极乐鸟',tag:'整活带师',emoji:'🌈',
+    desc:'没有活也能硬整，你是群里的快乐引擎。任何话题到你手里都能变成一场即兴喜剧。群友心情不好的时候第一个想到的就是你——因为你总有办法让所有人笑出声。',
+    profile:[10,12,10,11,5] },
+  { id:17, name:'白头海雕',tag:'群管威严',emoji:'🦅',
+    desc:'@所有人 的时候全员心头一紧，但日常你比谁都会玩。规则与骚话在你身上完美并存。你是秩序的维护者，也是群文化的缔造者——群友对你的敬畏里藏着深深的依赖。',
+    profile:[8,10,6,12,8] },
+  { id:18, name:'知更鸟',tag:'暖群担当',emoji:'🧡',
+    desc:'新人入群的第一缕阳光。"欢迎~""随时问！""没事慢慢来~"。你是群里的治愈系担当，有你在的群永远不会冷——不是消息多，是温度高。',
+    profile:[7,7,8,8,3] },
+  { id:19, name:'夜鹭',tag:'千面怪杰',emoji:'🌙',special:true,
+    desc:'上一秒在技术群对线，下一秒在摸鱼群发癫。风格切换如翻书，每条河你都能游。没有人能定义你是什么人设——因为你的人设就是没有人设。灵活是你的本质，多变是你的底色。',
+    profile:[9,8,8,8,7] }
+];
+
+const DIMENSIONS = [
+  { key:'freq',  name:'活跃度',   low:'深潜海底', high:'龙王在世', color:'var(--dim1)' },
+  { key:'style', name:'影响力',   low:'顺从附和', high:'主动带节奏', color:'var(--dim2)' },
+  { key:'express', name:'表达欲', low:'理性克制', high:'情绪释放', color:'var(--dim3)' },
+  { key:'belong', name:'归属感',  low:'边缘路人', high:'核心灵魂', color:'var(--dim4)' },
+  { key:'fight', name:'战斗力',   low:'爱与和平', high:'不服就干', color:'var(--dim5)' }
+];
+
+const QUESTIONS = [
+  // 维度一：活跃度 (freq) — Q1-3
+  { id:1, dim:'freq', text:'你打开QQ，发现群里已经聊了99+，你的第一反应是？',
+    opts:['无视，切到别的窗口，反正跟我没关系','翻一下最后几条看看在聊什么，但懒得爬完','翻到上次看到的位置，把错过的梗都补上','立刻加入战斗，99+有一半马上变成我发的'] },
+  { id:2, dim:'freq', text:'群主@所有人发了一条通知，你会？',
+    opts:['已读不回，@所有人对我无效','看完内容，在心里默默回了一句收到','回个表情包表示"已阅"','秒回并顺势带起一波新话题'] },
+  { id:3, dim:'freq', text:'你发现群里已经连续安静了两个小时，你会？',
+    opts:['完全没注意到，我甚至忘了还有这个群','注意到了但觉得很舒适，继续保持沉默','有点不习惯，丢个表情包试探一下还有没有人','必须打破沉默，随便找个话题也要把群救活'] },
+
+  // 维度二：影响力 (style) — Q4-6
+  { id:4, dim:'style', text:'看到群友在刷"+1"队形，你会？',
+    opts:['无视队形，甚至觉得有点烦','精准+1，保持队形整齐绝不破坏','先+1再偷偷把下一轮打成+2整活','我才是第一个发+1的人，队形是我带起来的'] },
+  { id:5, dim:'style', text:'群友从别的群／平台搬运了一坨"屎"（迷惑发言、逆天截图、尴尬内容），你会？',
+    opts:['看一眼标题就划走了，别人搬的屎我一口都不尝','点开看完，在心里评判"这什么玩意儿"，但不发表意见','回一个"典中典""难绷""抽象"之类的锐评，简洁有力','立刻存图／截图转发到其他群，让更多人品尝这坨好屎'] },
+  { id:6, dim:'style', text:'群友抛出一个话题冷场了，没人接，你会？',
+    opts:['看它沉下去，冷掉的话题没有抢救价值','心里默默替群友尴尬一秒，但还是不接','回一个"确实"或者表情包，假装有人在聊','必须接！不能让话掉地上，硬接也要接'] },
+
+  // 维度三：表达欲 (express) — Q7-9
+  { id:7, dim:'express', text:'群友在激烈讨论一个你懂的话题，但有人说错了，你会？',
+    opts:['懒得指正，网友的对错与我何干','默默打一段有理有据的纠正，写完又删了','发一条链接或截图作为证据，不多说一句废话','"不是，你在这瞎说什么呢？"直接开怼'] },
+  { id:8, dim:'express', text:'深夜一点，群里只剩你和另一个群友在线，你会？',
+    opts:['不觉得有什么特别的，该干嘛干嘛','犹豫要不要说话，算了继续潜水','发一句"还没睡啊"开启深夜闲聊模式','开始倾诉今天发生的所有事，顺便感慨一下人生'] },
+  { id:9, dim:'express', text:'你在群里分享了一个观点，有人表示不赞同，你会？',
+    opts:['无所谓，每个人有自己的看法，不继续争','再解释一遍但语气非常克制温和','摆事实讲道理，用数据说服对方','必须辩清楚，今晚不睡觉也要把这个问题论明白'] },
+
+  // 维度四：归属感 (belong) — Q10-12
+  { id:10, dim:'belong', text:'群里来了一个新人，大家都不认识，你会？',
+    opts:['跟我没关系，新人自有群主欢迎','潜水观察几天看看这人什么成分','发个"欢迎"表情包表示友好','主动招呼，"新人爆照！""哪个区的？"拉满仪式感'] },
+  { id:11, dim:'belong', text:'群里组织线下聚会／游戏开黑，你会？',
+    opts:['假装没看见，线下社交太累了','看到了但从不报名，云参与一下就行','看情况，人多了我就去蹭蹭热闹','第一个报名，甚至还帮忙张罗组织人手'] },
+  { id:12, dim:'belong', text:'如果这个群突然解散了，你的感受是？',
+    opts:['毫无波澜，可能过一个月才会发现','有点可惜，但也就这样吧','会想念，毕竟看了这么久大家聊天','像失去了一个家，立刻建新群把人都拉回来'] },
+
+  // 维度五：战斗力 (fight) — Q13-15
+  { id:13, dim:'fight', text:'群里两个人因为一件事吵起来了，火药味很重，你会？',
+    opts:['关闭群聊，等吵完了再回来，不想溅一身血','默默围观全程，在心里给双方打分','跳出来劝和，"兄弟们冷静一下各退一步"','加入战场，帮更有道理的那一方输出'] },
+  { id:14, dim:'fight', text:'有人发了一条明显带节奏／引战的言论，你会？',
+    opts:['心中毫无波澜，引战帖见多了，划过去就行','觉得不舒服但选择无视，不值得浪费时间','发个"典""绷""乐"之类的抽象评论，嘲讽但不点破','直接开怼，"发这个什么意思？说清楚"必须对线到底'] },
+  { id:15, dim:'fight', text:'你被群友艾特调侃了一句（玩笑性质），你的反应是？',
+    opts:['完全没注意到被艾特了，或者假装没看到','看到了笑一笑但不回复，优雅无视','回一个愤怒（假装）表情包，配合演出','立刻反击，玩笑开回去，必须比对方更狠才开心'] }
+];
+
+// ═══════════════ STATE ═══════════════
+let currentQ = 0;
+let answers = new Array(15).fill(-1);
+let isAdvancing = false; // prevent double-tap during auto-advance
+const SPRITE_COLS = 5;
+const SPRITE_ROWS = 4;
+
+// ═══════════════ INIT ═══════════════
+function init() {
+  createBirdGrid();
+  createProgressDots();
+}
+function createBirdGrid() {
+  const g = document.getElementById('birdGrid');
+  BIRDS.forEach((b, i) => {
+    const cell = document.createElement('div'); cell.className = 'bird-cell';
+    cell.style.backgroundPosition = birdPos(i);
+    cell.title = b.emoji + ' ' + b.name + ' — ' + b.tag;
+    g.appendChild(cell);
+  });
+}
+function birdPos(index) {
+  const col = index % SPRITE_COLS;
+  const row = Math.floor(index / SPRITE_COLS);
+  const xPct = (col / (SPRITE_COLS - 1)) * 100;
+  const yPct = (row / (SPRITE_ROWS - 1)) * 100;
+  return `${xPct}% ${yPct}%`;
+}
+function setResultBirdImg(index) {
+  const el = document.getElementById('resultImg');
+  el.style.backgroundPosition = birdPos(index);
+}
+
+// ═══════════════ SCREEN SWITCHING ═══════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════ QUIZ LOGIC ═══════════════
+function startQuiz() {
+  currentQ = 0;
+  answers = new Array(15).fill(-1);
+  showScreen('quiz-screen');
+  spawnFeathers(8);
+  renderQuestion();
+}
+function createProgressDots() {
+  const c = document.getElementById('progressDots');
+  c.innerHTML = '';
+  for (let i = 0; i < 15; i++) {
+    const d = document.createElement('span'); d.className = 'progress-dot';
+    d.id = 'dot' + i; c.appendChild(d);
+  }
+}
+function updateProgressDots() {
+  for (let i = 0; i < 15; i++) {
+    const d = document.getElementById('dot' + i);
+    d.className = 'progress-dot';
+    if (answers[i] >= 0) d.classList.add('done');
+    if (i === currentQ) d.classList.add('current');
+  }
+}
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('questionNum').textContent = `第 ${q.id} 题 · ${dimLabel(q.dim)}`;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('progressText').textContent = `${currentQ + 1} / 15`;
+
+  const optsEl = document.getElementById('options');
+  const letters = ['A','B','C','D'];
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if (answers[currentQ] === i) btn.classList.add('selected');
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectOption(i);
+    optsEl.appendChild(btn);
+  });
+
+  const btnPrev = document.getElementById('btnPrev');
+  btnPrev.style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+
+  const hint = document.getElementById('autoHint');
+  if (hint) hint.style.display = currentQ === 14 ? 'none' : '';
+
+  updateProgressDots();
+  const card = document.getElementById('questionCard');
+  card.classList.remove('fade-up');
+  void card.offsetWidth;
+  card.classList.add('fade-up');
+  // Update progress fill to reflect answered state
+  document.getElementById('progressFill').style.width = ((currentQ + 1) / 15 * 100) + '%';
+}
+function dimLabel(dimKey) {
+  const d = DIMENSIONS.find(dd => dd.key === dimKey);
+  return d ? d.name : dimKey;
+}
+function selectOption(idx) {
+  if (isAdvancing) return; // prevent double-tap during animation
+  isAdvancing = true;
+  answers[currentQ] = idx;
+  updateProgressDots();
+
+  // Highlight the selected option
+  const allOpts = document.querySelectorAll('#options .option');
+  allOpts.forEach((o, i) => { if (i === idx) o.classList.add('selected'); });
+
+  // Staggered exit animation
+  setTimeout(() => {
+    allOpts.forEach(o => o.classList.add('exiting'));
+  }, 180);
+
+  // Auto-advance after animation
+  setTimeout(() => {
+    if (currentQ < 14) {
+      currentQ++;
+      renderQuestion();
+      spawnFeathers(2);
+    } else {
+      showResult();
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    isAdvancing = false;
+  }, 520);
+}
+function nextQuestion() {
+  // Still available as fallback, but auto-advance is the primary flow
+  if (answers[currentQ] < 0) return;
+  if (currentQ < 14) {
+    currentQ++;
+    renderQuestion();
+    spawnFeathers(2);
+  } else {
+    showResult();
+  }
+}
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ═══════════════ SCORING ═══════════════
+function calcScores() {
+  const scores = { freq:0, style:0, express:0, belong:0, fight:0 };
+  QUESTIONS.forEach((q, i) => {
+    if (answers[i] >= 0) {
+      scores[q.dim] += (answers[i] + 1);
+    }
+  });
+  return scores;
+}
+function findBestBird(scores) {
+  const userVec = [
+    scores.freq, scores.style, scores.express, scores.belong, scores.fight
+  ];
+  let best = 0, bestDist = Infinity;
+  BIRDS.forEach((b, i) => {
+    const dist = b.profile.reduce((sum, v, j) => sum + Math.pow(v - userVec[j], 2), 0);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+  return best;
+}
+
+// ═══════════════ RESULT ═══════════════
+function showResult() {
+  const scores = calcScores();
+  const birdIdx = findBestBird(scores);
+  const bird = BIRDS[birdIdx];
+
+  showScreen('result-screen');
+  setResultBirdImg(birdIdx);
+  document.getElementById('resultName').textContent = bird.emoji + ' ' + bird.name;
+  document.getElementById('resultTag').textContent = bird.tag;
+  document.getElementById('resultDesc').textContent = bird.desc;
+  if (bird.special) {
+    document.querySelector('.result-label').textContent = '⭐ 隐藏结局';
+    document.querySelector('.result-label').style.color = 'var(--gold)';
+  } else {
+    document.querySelector('.result-label').textContent = '你的群聊人格是';
+    document.querySelector('.result-label').style.color = 'var(--accent2)';
+  }
+
+  const bars = document.getElementById('dimensionBars');
+  const dimKeys = ['freq','style','express','belong','fight'];
+  bars.innerHTML = DIMENSIONS.map((d, i) => {
+    const val = scores[d.key];
+    const pct = (val - 3) / 9 * 100;
+    return `<div class="dim-row">
+      <span class="dim-label">${d.name}</span>
+      <span style="font-size:.75rem;color:${d.color};width:40px;text-align:right;flex-shrink:0">${d.low}</span>
+      <div class="dim-bar-wrap"><div class="dim-bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+      <span style="font-size:.75rem;color:${d.color};width:40px;flex-shrink:0">${d.high}</span>
+    </div>`;
+  }).join('');
+
+  spawnFeathers(20);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function restartQuiz() {
+  currentQ = 0;
+  answers = new Array(15).fill(-1);
+  startQuiz();
+}
+function shareResult() {
+  const bird = BIRDS[findBestBird(calcScores())];
+  const text = `🦜 群友是啥鸟？\n\n我是【${bird.emoji} ${bird.name}】——${bird.tag}\n\n"${bird.desc}"\n\n你也来测测：群友是啥鸟？`;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('✅ 结果已复制到剪贴板！转发到群里让大家也测测吧~');
+  }).catch(() => {
+    prompt('复制下面的文字分享给群友吧：', text);
+  });
+}
+
+// ═══════════════ PARTICLES ═══════════════
+function spawnFeathers(count) {
+  const container = document.getElementById('particles');
+  const emojis = ['🪶','✨','💫','🍃','🕊️','🌿'];
+  for (let i = 0; i < count; i++) {
+    const f = document.createElement('span'); f.className = 'feather';
+    f.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    f.style.left = Math.random() * 100 + '%';
+    f.style.animationDuration = (2 + Math.random() * 4) + 's';
+    f.style.animationDelay = Math.random() * .5 + 's';
+    f.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+    container.appendChild(f);
+    setTimeout(() => f.remove(), 5000);
+  }
+}
+
+// ═══════════════ START ═══════════════
+init();
+
+// ═══════════════ KEYBOARD ═══════════════
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('result-screen').classList.contains('active')) return;
+  if (e.key === 'ArrowRight') nextQuestion();
+  if (e.key === 'ArrowLeft') prevQuestion();
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 4 && QUESTIONS[currentQ]) {
+    selectOption(num - 1);
+  }
+});
+</script>
+</body>
+</html>
