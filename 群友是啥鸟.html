@@ -242,6 +242,9 @@ body{
     <p class="desc">在活跃度、影响力、表达欲、归属感和战斗力之间，<br>测出你在群聊里的真实鸟类人格。</p>
     <div class="bird-grid" id="birdGrid"></div>
     <button class="btn" onclick="startQuiz()">✨ 开始测试</button>
+    <div class="view-counter" id="viewCounter" style="margin-top:24px;font-size:.8rem;color:var(--muted);opacity:.7;">
+      👀 <span id="viewCount">...</span> 只鸟已来过
+    </div>
   </div>
 </div>
 
@@ -630,6 +633,32 @@ function spawnFeathers(count) {
     setTimeout(() => f.remove(), 5000);
   }
 }
+
+// ═══════════════ COUNTER ═══════════════
+(function loadCounter(){
+  const el = document.getElementById('viewCount');
+  if (!el) return;
+  const NS = 'qun-bird-quiz', KEY = 'views';
+  // Try to fetch current count (no increment on repeat loads)
+  const storageKey = 'bird-quiz-viewed';
+  const alreadyViewed = sessionStorage.getItem(storageKey);
+  const url = alreadyViewed
+    ? `https://api.countapi.xyz/get/${NS}/${KEY}`
+    : `https://api.countapi.xyz/hit/${NS}/${KEY}`;
+
+  fetch(url, { method: 'GET' })
+    .then(r => { if (!r.ok) throw new Error('no'); return r.json(); })
+    .then(data => {
+      const count = data.value || 0;
+      el.textContent = count.toLocaleString();
+      if (!alreadyViewed) sessionStorage.setItem(storageKey, '1');
+    })
+    .catch(() => {
+      // Counter service unavailable — hide gracefully
+      const counter = document.getElementById('viewCounter');
+      if (counter) counter.style.display = 'none';
+    });
+})();
 
 // ═══════════════ START ═══════════════
 init();
